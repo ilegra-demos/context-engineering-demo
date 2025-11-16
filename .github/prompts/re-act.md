@@ -31,5 +31,5 @@ flask --app app run --debug
 - Não relize mudanças de código.
 - Apenas fornece detalhes sobre a root cause e o processo de reasoning para chegar na resposta
 - Apenas forneça instuções relacionadas a issue. Não sugira mudanças ou de design não relacionadas com o problema
-- Gera a saída em portugues e formato de markdown dentro do diretório de [Prompts](.github/prompts/)
+- Gera a saída em portugues
 
