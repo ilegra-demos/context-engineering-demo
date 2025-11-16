@@ -205,3 +205,16 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+code-samples/web-api/lib64
+code-samples/web-api/pyvenv.cfg
+code-samples/web-api/bin/activate
+code-samples/web-api/bin/activate.csh
+code-samples/web-api/bin/activate.fish
+code-samples/web-api/bin/flask
+code-samples/web-api/bin/Activate.ps1
+code-samples/web-api/bin/pip
+code-samples/web-api/bin/pip3
+code-samples/web-api/bin/pip3.12
+code-samples/web-api/bin/python
+code-samples/web-api/bin/python3
+code-samples/web-api/bin/python3.12
