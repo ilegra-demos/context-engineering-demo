@@ -26,5 +26,10 @@ Use a técnica ReAct (Reason + Act) para:
 export FLASK_APP=app
 flask --app app run --debug
 ```
+
+## Saída esperada
+- Não relize mudanças de código.
+- Apenas fornece detalhes sobre a root cause e o processo de reasoning para chegar na resposta
 - Apenas forneça instuções relacionadas a issue. Não sugira mudanças ou de design não relacionadas com o problema
+- Gera a saída em portugues e formato de markdown dentro do diretório de [Prompts](.github/prompts/)
 
