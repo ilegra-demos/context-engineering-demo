@@ -1,7 +1,7 @@
 ---
 agent: 'agent'
 description: 'Refactoring sample using Skeleton of Thoughts prompt style.'
-model: 'GPT-5-mini'
+model: 'GPT-5'
 ---
 
 <b>Aja como um Arquiteto de Software Sênior</b>. Sua função é sugerir uma abordagem técnica para endereçar problemas descritos na seção [Problemas](#problema).
