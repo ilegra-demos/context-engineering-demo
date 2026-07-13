@@ -1,11 +1,7 @@
 ---
 name: 'e2e-playwrite-mcp'
 description: 'Manually loaded agentic skill to plan, explore, implement, and validate Java Playwright E2E tests using the docker-compose Playwright MCP server.'
-trigger: 'manual'
-inputs:
-  - route: 'The frontend URL path to inspect and test (e.g., "/")'
-tools:
-  - playwright
+disable-model-invocation: true
 ---
 
 # Skill: e2e-playwrite-mcp

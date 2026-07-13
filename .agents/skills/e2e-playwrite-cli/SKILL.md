@@ -1,9 +1,7 @@
 ---
 name: 'e2e-playwrite-cli'
 description: 'Manually loaded agentic skill to plan, explore, implement, and validate Java Playwright E2E tests using the isolated playwright-cli Docker container and Node scripts instead of host dependencies.'
-trigger: 'manual'
-inputs:
-  - route: 'The frontend URL path to inspect and test (e.g., "/")'
+disable-model-invocation: true
 ---
 
 # Skill: e2e-playwrite-cli
