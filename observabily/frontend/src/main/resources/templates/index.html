@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog - Observability Control Room</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <header class="app-header" data-testid="header">
+        <div class="container header-container">
+            <div class="logo-group">
+                <span class="logo-dot"></span>
+                <h1>Observability Control Room</h1>
+            </div>
+            <div class="system-status">
+                <span class="pulse-icon"></span>
+                <span>System Live (Port: 8081)</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Error Alerts -->
+        <div class="alert alert-danger" th:if="${error}" data-testid="connection-error">
+            <strong>Connection Error:</strong> <span th:text="${error}">Error details</span>
+        </div>
+        <div class="alert alert-warning" th:if="${actionError}" data-testid="action-error">
+            <strong>Action Failed:</strong> <span th:text="${actionError}">Action error details</span>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Sidebar: Create Product -->
+            <section class="card create-card">
+                <h2>Register New Product</h2>
+                <p class="subtitle">Add a product to the catalog and trigger metrics.</p>
+                <form th:action="@{/products}" method="POST" data-testid="create-product-form">
+                    <div class="form-group">
+                        <label for="id">Product ID</label>
+                        <input type="text" id="id" name="id" placeholder="e.g. 3" required data-testid="input-id">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Product Name</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Teclado Mecânico" required data-testid="input-name">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price (R$)</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0.01" placeholder="350.00" required data-testid="input-price">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" name="quantity" min="1" placeholder="10" required data-testid="input-quantity">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cost">Acquisition Cost (R$)</label>
+                        <input type="text" id="cost" name="cost" placeholder="150.50" required data-testid="input-cost">
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags (comma separated)</label>
+                        <input type="text" id="tags" name="tags" placeholder="hardware, periféricos" data-testid="input-tags">
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-testid="btn-create-product">Add Product</button>
+                </form>
+            </section>
+
+            <!-- Main Area: Product List -->
+            <section class="main-content">
+                <div class="section-header">
+                    <h2>Current Catalog</h2>
+                    <span class="count-badge" th:text="${#lists.size(products)} + ' Products'">0 Products</span>
+                </div>
+
+                <div class="products-grid" data-testid="product-list">
+                    <!-- Iterating over products -->
+                    <div class="card product-card" th:each="p : ${products}" th:attr="data-testid='product-card-' + ${p.id}">
+                        <div class="product-header">
+                            <h3 th:text="${p.name}" th:attr="data-testid='product-name-' + ${p.id}">Product Name</h3>
+                            <span class="product-id" th:text="'#' + ${p.id}">#1</span>
+                        </div>
+                        
+                        <div class="product-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">Price</span>
+                                <span class="metric-value price" th:text="'R$ ' + ${p.price}" th:attr="data-testid='product-price-' + ${p.id}">R$ 350.00</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Qty in Stock</span>
+                                <span class="metric-value" th:text="${p.quantity}" th:attr="data-testid='product-quantity-' + ${p.id}">10</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Cost</span>
+                                <span class="metric-value cost" th:text="'R$ ' + ${p.cost}">R$ 150.50</span>
+                            </div>
+                        </div>
+
+                        <!-- Tag List -->
+                        <div class="product-tags" th:attr="data-testid='product-tags-' + ${p.id}">
+                            <span class="tag" th:each="tag : ${p.tags}" th:text="${tag}">hardware</span>
+                        </div>
+
+                        <!-- Discount Form -->
+                        <div class="discount-section">
+                            <form th:action="@{/products/{id}/apply-discount(id=${p.id})}" method="POST" class="discount-form" th:attr="data-testid='discount-form-' + ${p.id}">
+                                <div class="discount-input-wrapper">
+                                    <input type="number" name="discount_percent" min="0" max="90" step="0.1" placeholder="Discount %" required th:attr="data-testid='input-discount-' + ${p.id}">
+                                    <span class="percent-symbol">%</span>
+                                </div>
+                                <button type="submit" class="btn btn-secondary" th:attr="data-testid='btn-apply-discount-' + ${p.id}">Apply</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" th:if="${#lists.isEmpty(products)}">
+                    <p>No products in database. Add a new product to see it appear here!</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

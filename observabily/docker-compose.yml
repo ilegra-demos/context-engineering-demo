@@ -13,6 +13,20 @@ services:
     networks:
       - observability-net
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - web-api
+    networks:
+      - observability-net
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.95.0
     container_name: otel-collector
