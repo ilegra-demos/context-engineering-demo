@@ -15,11 +15,11 @@ curl -sS -X POST http://127.0.0.1:5000/products/1/apply-discount \
 
 ## Objetivo
 Use a técnica ReAct (Reason + Act) para:
-- Executar os comandos fornecidos para confirmar a existencia da issue
-- Identificar a causa raiz do problema
+- Diagnosticar a root cause do problema
 - Pense passo-a-passo e forneça um wofkflow para implemntar um hot-fix
 
 ## Guidelines
+- Executar os comandos fornecidos para reproduzir issue confirmar a existencia da mesma. Caso o problema não seja reproduzível, explique o raciocínio e as etapas que você tomou para chegar a essa conclusão.
  - Para executar o ambiente localmente, execute os seguintes comandos:
  ```bash
  cd web-api
@@ -32,5 +32,6 @@ flask --app app run --debug
 - Não relize mudanças de código.
 - Apenas fornece detalhes sobre a root cause e o processo de reasoning para chegar na resposta
 - Apenas forneça instuções relacionadas a issue. Não sugira mudanças ou de design não relacionadas com o problema
+- Caso exista mais de uma oppção de hot-fix, forneça as vantagens e desvantagens de cada abordagem. Utilize tabelas para comparar as opções.
 - Fornece um plano de ação para uma implementação de um  hot fix.
 - Gera a saída em portugues
