@@ -85,6 +85,18 @@ services:
     networks:
       - observability-net
 
+  playwright-cli:
+    image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    container_name: playwright-cli
+    volumes:
+      - ..:/app
+    working_dir: /app
+    entrypoint: ["tail", "-f", "/dev/null"]
+    depends_on:
+      - frontend
+    networks:
+      - observability-net
+
 networks:
   observability-net:
     driver: bridge

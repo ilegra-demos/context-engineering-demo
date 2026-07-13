@@ -31,6 +31,10 @@ The section includes metadata filters for:
    - `.vscode/settings.json`
    - `github.copilot.chat.otel.enabled: true`
    - `github.copilot.chat.otel.otlpEndpoint: http://localhost:4318`
+4. Playwright and MCP dependencies are fully containerized (no local Node/npm installs required):
+   - The MCP approach runs using the `playwright-mcp` service container.
+   - The CLI approach runs using the isolated `playwright-cli` service container.
+   - E2E tests are executed inside the official Playwright Java docker runner.
 
 ## Start the stack
 
@@ -44,6 +48,21 @@ Services:
 - OTEL Collector: `localhost:4318` (OTLP HTTP), `localhost:4317` (OTLP gRPC)
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3005`
+
+## Running E2E Tests
+
+You can run the end-to-end tests representing different agentic skills/approaches using the helper script:
+
+```bash
+# Run the MCP-based agentic skill test (ProductCatalogE2eTest)
+./run-e2e.sh mcp
+
+# Run the CLI-based agentic skill test (ProductCatalogCliE2eTest)
+./run-e2e.sh cli
+
+# Run both E2E tests
+./run-e2e.sh all
+```
 
 ## Use the dashboard
 
