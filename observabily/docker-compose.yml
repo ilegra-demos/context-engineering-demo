@@ -71,6 +71,20 @@ services:
     networks:
       - observability-net
 
+  playwright-mcp:
+    image: mcr.microsoft.com/playwright/mcp:latest
+    container_name: playwright-mcp
+    init: true
+    entrypoint: ["node", "/app/cli.js", "--headless", "--browser", "chromium", "--no-sandbox", "--port", "8931", "--host", "0.0.0.0"]
+    ports:
+      - "8931:8931"
+    environment:
+      - PORT=8931
+    depends_on:
+      - frontend
+    networks:
+      - observability-net
+
 networks:
   observability-net:
     driver: bridge
