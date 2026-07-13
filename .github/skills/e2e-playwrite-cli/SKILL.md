@@ -59,7 +59,7 @@ Using the DOM structure identified during the exploration step:
 ---
 
 ### Step 4: Java E2E Test Implementation
-Implement or update the E2E test class in the `observabily/frontend/src/test/java/com/example/demo/` directory (e.g., `ProductCatalogCliE2eTest.java`):
+Implement or update the E2E test class in the `observabily/frontend/src/test/java/com/example/demo/` directory (`ProductCatalogE2eTest.java`):
 - Use JUnit 5 annotations (`org.junit.jupiter.api.*`).
 - Instantiate and use Playwright Java client APIs (`com.microsoft.playwright.*`).
 - **URL Configuration:** Since the Java tests execute using the host network, they must navigate to the host port:
@@ -73,7 +73,7 @@ Implement or update the E2E test class in the `observabily/frontend/src/test/jav
 Execute and debug the tests to ensure everything is correct and green:
 1. Run the test suite using the Gradle wrapper within the Playwright Java runner container by executing the helper script from the `observabily/` directory:
    ```bash
-   ./run-e2e.sh cli
+   ./run-e2e.sh
    ```
 2. If the build or tests fail, inspect the error output, re-run the exploration commands (such as taking screenshots with the Playwright CLI) to check the UI state, and adjust selectors or assertions until the test passes.
 

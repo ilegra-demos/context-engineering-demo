@@ -51,17 +51,10 @@ Services:
 
 ## Running E2E Tests
 
-You can run the end-to-end tests representing different agentic skills/approaches using the helper script:
+You can run the end-to-end tests using the helper script:
 
 ```bash
-# Run the MCP-based agentic skill test (ProductCatalogE2eTest)
-./run-e2e.sh mcp
-
-# Run the CLI-based agentic skill test (ProductCatalogCliE2eTest)
-./run-e2e.sh cli
-
-# Run both E2E tests
-./run-e2e.sh all
+./run-e2e.sh
 ```
 
 ## Use the dashboard
