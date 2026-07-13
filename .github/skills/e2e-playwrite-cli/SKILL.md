@@ -2,106 +2,94 @@
 name: 'e2e-playwrite-cli'
 description: 'Manually loaded agentic skill to plan, explore, implement, and validate Java Playwright E2E tests using the isolated playwright-cli Docker container and Node scripts instead of host dependencies.'
 trigger: 'manual'
-model: 'Gemini 3.5 Flash'
 inputs:
   - route: 'The frontend URL path to inspect and test (e.g., "/")'
 ---
 
 # Skill: e2e-playwrite-cli
 
-Você é um agente especialista em Engenharia de Software e QA encarregado de planejar, explorar, implementar e validar testes E2E (End-to-End) usando **Playwright Java** para o módulo `@observabily/frontend`. 
+You are an expert Software Engineering and QA Agent tasked with planning, exploring, implementing, and validating E2E (End-to-End) tests using **Playwright Java** for the `@observabily/frontend` module.
 
-Este skill deve ser executado **manualmente** mediante demanda do usuário e recebe como entrada uma **rota/feature** específica para testar. Ao contrário da versão `e2e-playwrite-mcp`, esta skill utiliza diretamente a **Playwright CLI / Node running inside an isolated playwright-cli container** to explore the pages.
+This skill is executed **manually** upon user request and receives a specific **route/feature** to test as input. Unlike the `e2e-playwrite-mcp` version, this skill uses direct CLI commands and native Playwright screenshot tools inside an isolated container to inspect the application.
 
 ---
 
-## Fluxo de Execução da Skill
+## Skill Execution Flow
 
-### Passo 1: Verificação de Dependências (Playwright CLI Container)
-Antes de começar, verifique se o container isolado do Playwright está ativo e pronto:
-1. Certifique-se de que a stack de observabilidade e o container `playwright-cli` estão rodando:
+### Step 1: Environment Setup & Dependency Validation
+Before proceeding with any test development, verify that the observability stack and the isolated Playwright container are up and running:
+1. Ensure the docker-compose services (including `playwright-cli`) are active:
    ```bash
    cd observabily
    docker compose up -d playwright-cli
    ```
-2. Verifique se o pacote `playwright` está instalado globalmente no container:
+2. Verify that the `playwright` package is installed globally inside the container:
    ```bash
    docker compose exec playwright-cli npm install -g playwright@1.44.0
    ```
-3. Valide se a CLI responde corretamente de dentro do container:
+3. Validate that the Playwright CLI responds correctly from inside the container:
    ```bash
    docker compose exec playwright-cli npx --yes playwright@1.44.0 --version
    ```
-
----
-
-### Passo 2: Inicialização do Ambiente & Health Check
-Garanta que a aplicação web-api e frontend estejam respondendo:
-1. Verifique o status dos containers:
-   ```bash
-   docker compose ps
-   ```
-2. Valide se o frontend está ativo localmente no host:
+4. Verify that the frontend application is running and accessible on the host:
    - Frontend: `http://localhost:8081`
 
 ---
 
-### Passo 3: Exploração Interativa via Container Playwright
-Em vez de utilizar as ferramentas do servidor MCP, você deve explorar a página alvo (`http://frontend:8081{{route}}`) usando um script Node.js temporário rodando dentro do container `playwright-cli`:
-1. Crie um script temporário na pasta scratch do workspace (ex: `scratch/explore.js`):
-   ```javascript
-   const { chromium } = require('playwright');
-   
-   (async () => {
-     // Lançar browser headless
-     const browser = await chromium.launch({ headless: true });
-     const page = await browser.newPage();
-     
-     // ATENÇÃO: Como o script roda na rede do Docker, usamos o hostname interno 'frontend'
-     console.log('Navigating to http://frontend:8081{{route}}...');
-     await page.goto('http://frontend:8081{{route}}');
-     
-     // Tirar um print da tela para inspeção visual
-     await page.screenshot({ path: 'scratch/explore_screenshot.png' });
-     console.log('Screenshot saved to scratch/explore_screenshot.png');
-     
-     // Extrair e exibir o conteúdo DOM relevante
-     const bodyHTML = await page.evaluate(() => document.body.innerHTML);
-     console.log('--- DOM BODY CONTENT ---');
-     console.log(bodyHTML);
-     console.log('------------------------');
-     
-     await browser.close();
-   })();
-   ```
-2. Execute o script dentro do container usando `NODE_PATH` para carregar a biblioteca global:
+### Step 2: Interactive Page Exploration
+Instead of using MCP browser tools, you must explore the target page (`http://frontend:8081{{route}}`) using standard shell and Playwright command line tools:
+1. Fetch the raw HTML of the page directly from the host to understand the initial server-side rendered DOM structure (forms, inputs, and attributes like `data-testid`):
    ```bash
-   docker compose exec playwright-cli sh -c "NODE_PATH=\$(npm root -g) node scratch/explore.js"
+   curl -s http://localhost:8081{{route}}
    ```
-3. Inspecione o HTML retornado no terminal e os arquivos de screenshot na pasta `scratch` do host para mapear os seletores CSS (`data-testid`, IDs, classes) dos formulários e botões da página.
-
----
-
-### Passo 4: Planejamento de Casos de Teste
-Com base na estrutura de elementos obtida pela exploração do container:
-1. Identifique o **Happy Path** (fluxo principal).
-2. Mapeie **Edge Cases** (casos de erro, validações).
-3. Liste os seletores exatos (`data-testid='...'`) a serem usados nas asserções.
-
----
-
-### Passo 5: Implementação em Java (JUnit 5 + Playwright)
-Implemente ou atualize a classe de teste correspondente no diretório `observabily/frontend/src/test/java/com/example/demo/`:
-- Utilize JUnit 5 (`org.junit.jupiter.api.*`).
-- Instancie a biblioteca Playwright Java (`com.microsoft.playwright.*`).
-- **URL no código Java:** Utilize o endereço local no host: `http://localhost:8081/`
-
----
-
-### Passo 6: Execução & Validação da Suíte
-Valide os testes usando o container oficial do Playwright Java para rodar a suíte via Gradle wrapper:
-1. Execute a partir do diretório `observabily/frontend`:
+2. Take a visual screenshot of the target page using the Playwright CLI screenshot tool inside the container (which uses the internal container network hostname `frontend`):
    ```bash
-   docker run --rm --network="host" -v $(pwd):/app -w /app mcr.microsoft.com/playwright/java:v1.44.0-jammy ./gradlew test --tests "com.example.demo.<TestClassName>"
+   docker compose exec playwright-cli npx --yes playwright@1.44.0 screenshot http://frontend:8081{{route}} scratch/explore_screenshot.png
    ```
-2. Se houver falhas, depure re-executando o script Node.js de exploração no container `playwright-cli` para validar alterações no DOM até obter sucesso.
+3. Inspect the returned HTML and the screenshot file saved in the `scratch/` folder to map the exact CSS selectors (such as `data-testid`, IDs, or classes) of buttons, input fields, and output elements.
+
+---
+
+### Step 3: Test Case Planning
+Using the DOM structure identified during the exploration step:
+1. **Happy Path:** Define the primary successful flow (e.g., navigating to the page, filling inputs, submitting the form, and asserting the target element becomes visible).
+2. **Edge Cases & Error Handling:** Define error states (e.g., empty form submissions, connection failures, validation errors) and how they manifest in the UI.
+3. List the exact CSS selectors (e.g., `[data-testid='input-id']`) and corresponding assertions you will write.
+
+---
+
+### Step 4: Java E2E Test Implementation
+Implement or update the E2E test class in the `observabily/frontend/src/test/java/com/example/demo/` directory (e.g., `ProductCatalogCliE2eTest.java`):
+- Use JUnit 5 annotations (`org.junit.jupiter.api.*`).
+- Instantiate and use Playwright Java client APIs (`com.microsoft.playwright.*`).
+- **URL Configuration:** Since the Java tests execute using the host network, they must navigate to the host port:
+  ```java
+  page.navigate("http://localhost:8081{{route}}");
+  ```
+
+---
+
+### Step 5: Test Execution & Validation
+Execute and debug the tests to ensure everything is correct and green:
+1. Run the test suite using the Gradle wrapper within the Playwright Java runner container by executing the helper script from the `observabily/` directory:
+   ```bash
+   ./run-e2e.sh cli
+   ```
+2. If the build or tests fail, inspect the error output, re-run the exploration commands (such as taking screenshots with the Playwright CLI) to check the UI state, and adjust selectors or assertions until the test passes.
+
+---
+
+## Usage Example via Agent Chat
+
+To manually trigger this skill through agent chat, prompt the AI assistant by referencing this skill file and supplying the required input parameters:
+
+```markdown
+Please run the skill @.github/skills/e2e-playwrite-cli/SKILL.md with inputs:
+- route: "/"
+```
+
+Or:
+
+```markdown
+Execute the manual `e2e-playwrite-cli` skill for route "/"
+```

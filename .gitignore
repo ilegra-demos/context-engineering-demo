@@ -221,3 +221,4 @@ code-samples/web-api/bin/python3.12
 
 
 .gradle
+scratch/**
