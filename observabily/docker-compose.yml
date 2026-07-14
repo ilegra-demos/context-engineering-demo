@@ -75,7 +75,7 @@ services:
     image: mcr.microsoft.com/playwright/mcp:latest
     container_name: playwright-mcp
     init: true
-    entrypoint: ["node", "/app/cli.js", "--headless", "--browser", "chromium", "--no-sandbox", "--port", "8931", "--host", "0.0.0.0"]
+    entrypoint: ["/bin/bash", "-c", "node -e 'const fs = require(\"fs\"); const file = \"/app/node_modules/playwright-core/lib/utilsBundle.js\"; if (fs.existsSync(file)) fs.writeFileSync(file, fs.readFileSync(file, \"utf8\").replace(/if \\(!acceptHeader\\?\\.includes\\(\"application\\/json\"\\) \\|\\| !acceptHeader\\.includes\\(\"text\\/event-stream\"\\)\\) {/, \"if (false) {\"));' && exec node /app/cli.js --headless --browser chromium --no-sandbox --port 8931 --host 0.0.0.0"]
     ports:
       - "8931:8931"
     environment:

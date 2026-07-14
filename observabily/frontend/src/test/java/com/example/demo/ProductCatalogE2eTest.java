@@ -82,4 +82,53 @@ public class ProductCatalogE2eTest {
         Locator updatedPrice = page.locator("[data-testid='product-price-" + testProductId + "']");
         assertTrue(updatedPrice.textContent().trim().contains("270")); 
     }
+
+    @Test
+    @DisplayName("Verify default products are rendered correctly in the catalog")
+    void testDefaultProductsRendering() {
+        // 1. Navigate to the app home page
+        page.navigate("http://localhost:8081/");
+
+        // 2. Verify that the product list container is visible
+        Locator productList = page.locator("[data-testid='product-list']");
+        assertTrue(productList.isVisible());
+
+        // 3. Verify that the default product #1 (Teclado Mecânico) is present with correct details
+        Locator productCard1 = page.locator("[data-testid='product-card-1']");
+        assertTrue(productCard1.isVisible());
+        assertEquals("Teclado Mecânico", page.locator("[data-testid='product-name-1']").textContent().trim());
+        assertTrue(page.locator("[data-testid='product-price-1']").textContent().trim().contains("350"));
+        assertEquals("10", page.locator("[data-testid='product-quantity-1']").textContent().trim());
+
+        // 4. Verify that the default product #2 (Mouse Gamer) is present with correct details
+        Locator productCard2 = page.locator("[data-testid='product-card-2']");
+        assertTrue(productCard2.isVisible());
+        assertEquals("Mouse Gamer", page.locator("[data-testid='product-name-2']").textContent().trim());
+        assertTrue(page.locator("[data-testid='product-price-2']").textContent().trim().contains("199.9"));
+        assertEquals("5", page.locator("[data-testid='product-quantity-2']").textContent().trim());
+    }
+
+    @Test
+    @DisplayName("Verify error handling when registering a product with a duplicate ID")
+    void testDuplicateProductCreationError() {
+        // 1. Navigate to the app home page
+        page.navigate("http://localhost:8081/");
+
+        // 2. Submit a product using a duplicate ID '1' (which is already registered as a default product)
+        page.fill("[data-testid='input-id']", "1");
+        page.fill("[data-testid='input-name']", "Duplicate Product");
+        page.fill("[data-testid='input-price']", "100.00");
+        page.fill("[data-testid='input-quantity']", "10");
+        page.fill("[data-testid='input-cost']", "50.00");
+        page.fill("[data-testid='input-tags']", "duplicate");
+
+        // Submit the form
+        page.click("[data-testid='btn-create-product']");
+
+        // 3. Verify that an action-error alert is displayed
+        Locator errorAlert = page.locator("[data-testid='action-error']");
+        assertTrue(errorAlert.isVisible());
+        assertTrue(errorAlert.textContent().contains("409 Conflict"));
+        assertTrue(errorAlert.textContent().contains("Produto já existe"));
+    }
 }
