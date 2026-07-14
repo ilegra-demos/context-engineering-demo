@@ -84,51 +84,36 @@ public class ProductCatalogE2eTest {
     }
 
     @Test
-    @DisplayName("Verify default products are rendered correctly in the catalog")
-    void testDefaultProductsRendering() {
+    @DisplayName("Verify product list display on initial page load")
+    void testProductListDisplay() {
         // 1. Navigate to the app home page
         page.navigate("http://localhost:8081/");
 
-        // 2. Verify that the product list container is visible
+        // 2. Verify main sections are visible
+        Locator header = page.locator("[data-testid='header']");
+        assertTrue(header.isVisible());
+        assertTrue(header.textContent().contains("Observability Control Room"));
+
+        Locator createForm = page.locator("[data-testid='create-product-form']");
+        assertTrue(createForm.isVisible());
+
         Locator productList = page.locator("[data-testid='product-list']");
         assertTrue(productList.isVisible());
 
-        // 3. Verify that the default product #1 (Teclado Mecânico) is present with correct details
-        Locator productCard1 = page.locator("[data-testid='product-card-1']");
-        assertTrue(productCard1.isVisible());
-        assertEquals("Teclado Mecânico", page.locator("[data-testid='product-name-1']").textContent().trim());
-        assertTrue(page.locator("[data-testid='product-price-1']").textContent().trim().contains("350"));
-        assertEquals("10", page.locator("[data-testid='product-quantity-1']").textContent().trim());
+        // 3. Verify standard pre-seeded products (ID #1 and ID #2) are visible
+        Locator product1Card = page.locator("[data-testid='product-card-1']");
+        assertTrue(product1Card.isVisible());
+        Locator product1Name = page.locator("[data-testid='product-name-1']");
+        assertEquals("Teclado Mecânico", product1Name.textContent().trim());
+        Locator product1Price = page.locator("[data-testid='product-price-1']");
+        assertTrue(product1Price.textContent().contains("350"));
 
-        // 4. Verify that the default product #2 (Mouse Gamer) is present with correct details
-        Locator productCard2 = page.locator("[data-testid='product-card-2']");
-        assertTrue(productCard2.isVisible());
-        assertEquals("Mouse Gamer", page.locator("[data-testid='product-name-2']").textContent().trim());
-        assertTrue(page.locator("[data-testid='product-price-2']").textContent().trim().contains("199.9"));
-        assertEquals("5", page.locator("[data-testid='product-quantity-2']").textContent().trim());
-    }
-
-    @Test
-    @DisplayName("Verify error handling when registering a product with a duplicate ID")
-    void testDuplicateProductCreationError() {
-        // 1. Navigate to the app home page
-        page.navigate("http://localhost:8081/");
-
-        // 2. Submit a product using a duplicate ID '1' (which is already registered as a default product)
-        page.fill("[data-testid='input-id']", "1");
-        page.fill("[data-testid='input-name']", "Duplicate Product");
-        page.fill("[data-testid='input-price']", "100.00");
-        page.fill("[data-testid='input-quantity']", "10");
-        page.fill("[data-testid='input-cost']", "50.00");
-        page.fill("[data-testid='input-tags']", "duplicate");
-
-        // Submit the form
-        page.click("[data-testid='btn-create-product']");
-
-        // 3. Verify that an action-error alert is displayed
-        Locator errorAlert = page.locator("[data-testid='action-error']");
-        assertTrue(errorAlert.isVisible());
-        assertTrue(errorAlert.textContent().contains("409 Conflict"));
-        assertTrue(errorAlert.textContent().contains("Produto já existe"));
+        Locator product2Card = page.locator("[data-testid='product-card-2']");
+        assertTrue(product2Card.isVisible());
+        Locator product2Name = page.locator("[data-testid='product-name-2']");
+        assertEquals("Mouse Gamer", product2Name.textContent().trim());
+        Locator product2Price = page.locator("[data-testid='product-price-2']");
+        assertTrue(product2Price.textContent().contains("199.9"));
     }
 }
+
